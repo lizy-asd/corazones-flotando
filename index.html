@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cielo mágico ✨</title>
+
+  <!-- Tipos (frases/labels si los usas) -->
+  <link href="https://fonts.googleapis.com/css2?family=Sail&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css" />
+  <meta name="theme-color" content="#ffcee8">
+</head>
+<body>
+  <!-- CIELO -->
+  <div class="sky" aria-hidden="true">
+    <!-- halo/viñeta -->
+    <div class="vignette"></div>
+    <!-- aurora -->
+    <div class="aurora"></div>
+
+    <!-- estrellas (parallax 3 capas) -->
+    <div id="stars-back"  class="stars"></div>
+    <div id="stars-mid"   class="stars"></div>
+    <div id="stars-front" class="stars"></div>
+
+    <!-- constelaciones suaves -->
+    <svg class="constellations" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+
+    <!-- nubes (parallax 3 capas) -->
+    <div id="clouds-back"  class="clouds"></div>
+    <div id="clouds-mid"   class="clouds"></div>
+    <div id="clouds-front" class="clouds"></div>
+  </div>
+
+  <!-- CAPA INTERACTIVA (corazones/frases) -->
+  <div id="hearts-layer"></div>
+
+  <!-- plantillas corazones/frase/partículas -->
+  <template id="heart-template">
+    <button class="heart" aria-label="Corazón">
+      <svg class="svg-heart" viewBox="0 0 64 64" width="100%" height="100%" aria-hidden="true">
+        <defs>
+          <linearGradient id="gFill2" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%"  stop-color="#ff8fb0"/>
+            <stop offset="60%" stop-color="#ff4f80"/>
+            <stop offset="100%" stop-color="#e53a71"/>
+          </linearGradient>
+          <radialGradient id="gGloss2" cx="28%" cy="28%" r="45%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+            <stop offset="60%" stop-color="#ffffff" stop-opacity="0.15"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <path d="M32 58C32 58 10 43 6 27C3 16 10 7 20 7c6 0 9 3 12 7c3-4 6-7 12-7c10 0 17 9 14 20C54 43 32 58 32 58z" fill="url(#gFill2)"/>
+        <ellipse cx="22" cy="18" rx="10" ry="7" fill="url(#gGloss2)"/>
+      </svg>
+    </button>
+  </template>
+  <template id="phrase-template"><span class="phrase" style="font-family:'Sail','Noto Color Emoji',cursive"></span></template>
+  <template id="particle-template"><span class="particle"></span></template>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
