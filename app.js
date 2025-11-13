@@ -6,7 +6,9 @@ const choice = a => a[Math.floor(Math.random()*a.length)];
 const IS_LOWPOWER =
   window.matchMedia('(max-width: 480px), (prefers-reduced-motion: reduce)').matches ||
   (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
-let warmed = false;  // se activa tras warmUp()
+
+let warmed = false;          // se activa cuando termina el warm-up
+let firstBurstDone = false;  // control del primer estallido
 
 /* ====== estrellas ====== */
 function createStars(id,count){
@@ -24,7 +26,7 @@ function createStars(id,count){
   el.appendChild(frag);
 }
 
-/* ====== constelaciones suaves ====== */
+/* ====== constelaciones ====== */
 function drawConstellations(){
   const svg = document.querySelector('.constellations');
   const NS  = 'http://www.w3.org/2000/svg';
@@ -67,11 +69,10 @@ function shootingStar(){
   document.body.appendChild(s);
   s.addEventListener('animationend', ()=>s.remove(), {once:true});
 }
-// temporizador estable (evita ráfagas juntas)
 setInterval(()=>{ if(document.visibilityState==='visible') shootingStar(); }, 4500);
 
 /* ====== parallax desactivado ====== */
-function parallax(){/* noop */}
+function parallax(){}
 
 /* ====== generar fondo ====== */
 createStars('stars-back',  IS_LOWPOWER ? 80 : 120);
@@ -86,7 +87,7 @@ createClouds('clouds-front', IS_LOWPOWER ? 3 : 4, 55, 85, 34, 48);
 ['#stars-back','#stars-mid','#stars-front','#clouds-back','#clouds-mid','#clouds-front','.aurora']
   .forEach(sel=>{ document.querySelectorAll(sel).forEach(el=> el.style.transform=''); });
 
-/* ====== (opcional) corazones + frases ====== */
+/* ====== corazones + frases ====== */
 const layer       = document.getElementById('hearts-layer');
 const tplHeart    = document.getElementById('heart-template');
 const tplPhrase   = document.getElementById('phrase-template');
@@ -105,7 +106,6 @@ function spawnHeart(){
   const s = rand(40,70); h.style.width = h.style.height = s+'px';
   h.style.animation = `floatUp ${rand(9,15)}s linear forwards`;
   h.addEventListener('animationend', ()=>h.remove(), {once:true});
-  // 👉 reacción inmediata y sin artefactos de focus en móvil
   h.addEventListener('pointerdown', e => { e.currentTarget.blur?.(); popHeart(e,h); }, {passive:true});
   layer.appendChild(h);
 }
@@ -113,7 +113,8 @@ function spawnHeart(){
 function popHeart(e, heart){
   const r = layer.getBoundingClientRect();
   const x = e.clientX - r.left, y = e.clientY - r.top;
-  showPhrase(x,y); burst(x,y);
+  showPhrase(x,y);
+  burst(x,y);
   heart.remove();
 }
 
@@ -122,14 +123,16 @@ function showPhrase(x,y){
   el.textContent = choice(PHRASES);
   el.style.left = x+'px';
   el.style.top  = y+'px';
+  // Primer frase: sin text-shadow (lo añade el CSS), para evitar hitch si aún no está cacheado
+  if (!warmed) el.style.textShadow = 'none';
   layer.appendChild(el);
-  setTimeout(()=>el.remove(), 1400);
+  setTimeout(()=>el.remove(), 1200);
 }
 
 function burst(x,y){
-  // Adaptativo: primer toque/móviles -> menos partículas y sin sombras
+  // Primer burst ULTRA-LIGERO, luego normal/adaptativo
   const MAX   = IS_LOWPOWER ? 8 : 14;
-  const count = warmed ? MAX : Math.min(6, MAX);
+  const count = !firstBurstDone ? 4 : (warmed ? MAX : Math.min(6,MAX));
 
   const frag = document.createDocumentFragment();
   for(let i=0;i<count;i++){
@@ -139,35 +142,49 @@ function burst(x,y){
     p.style.left = x+'px'; p.style.top = y+'px';
     p.style.setProperty('--tx', Math.cos(a)*d+'px');
     p.style.setProperty('--ty', Math.sin(a)*d+'px');
-    if (!warmed || IS_LOWPOWER) p.style.boxShadow = 'none';
+    // En el primer estallido y/o equipos modestos: sin sombras ni gradientes pesadas
+    if (!firstBurstDone || IS_LOWPOWER){
+      p.style.boxShadow = 'none';
+      p.style.background = 'linear-gradient(145deg,#ff4f80,#ff8fb0)'; // sin radial
+    }
     frag.appendChild(p);
     p.addEventListener('animationend', ()=>p.remove(), {once:true});
   }
   layer.appendChild(frag);
+  firstBurstDone = true;
 }
 
 /* activar corazones */
 for(let i=0;i<14;i++) spawnHeart();
 (function loop(){ spawnHeart(); setTimeout(loop, rand(800,1300)); })();
 
-/* chispitas al tocar el cielo (ignora corazones para evitar doble efecto) */
+/* toque en el cielo (ignora corazones para evitar doble efecto) */
 document.body.addEventListener('pointerdown', e=>{
   if (e.target.closest('.heart')) return;
   const r = layer.getBoundingClientRect();
   burst(e.clientX - r.left, e.clientY - r.top);
 }, {passive:true});
 
-/* ====== warm-up: compila animaciones/fuentes antes del primer tap ====== */
-function warmUp(){
-  // micro burst fuera de pantalla
+/* ====== WARM-UP AGRESIVO (ejecuta ya mismo) ====== */
+(function warmUp(){
+  if (warmed) return;
+  // 1) crea 1 corazón off-screen y ejecuta su animación (compila SVG + keyframes)
+  const h = tplHeart.content.firstElementChild.cloneNode(true);
+  h.style.left='-200px'; h.style.top='110vh'; h.style.width=h.style.height='50px';
+  h.style.animation='floatUp 0.8s linear forwards';
+  layer.appendChild(h);
+  h.addEventListener('animationend', ()=>h.remove(), {once:true});
+
+  // 2) mini burst fuera de pantalla
   burst(-100,-100);
-  // micro frase oculta para cachear fuente/estilos
-  if (tplPhrase){
-    const el = tplPhrase.content.firstElementChild.cloneNode(true);
-    el.textContent = "✨";
-    el.style.left='-9999px'; el.style.top='-9999px';
-    layer.appendChild(el); setTimeout(()=>el.remove(), 50);
-  }
+
+  // 3) mini frase oculta para cachear fuente
+  const el = tplPhrase.content.firstElementChild.cloneNode(true);
+  el.textContent = "✨";
+  el.style.left='-9999px'; el.style.top='-9999px';
+  el.style.textShadow='none';
+  layer.appendChild(el);
+  setTimeout(()=>el.remove(), 60);
+
   warmed = true;
-}
-(window.requestIdleCallback || window.requestAnimationFrame)(warmUp);
+})();
