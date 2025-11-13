@@ -158,12 +158,19 @@ body{
 
 /* partículas y frase (si usas frases) */
 .particle{
-  position:absolute; width:8px; height:8px; border-radius:50%;
-  background: radial-gradient(circle at 30% 30%, #fff8 0 30%, #0000 40%),
-              linear-gradient(145deg, var(--pink1), var(--pink2));
-  box-shadow: 0 0 10px #ffffffaa, 0 0 16px #ff8fb055;
-  opacity:0; animation: burst .6s ease-out forwards; pointer-events:none
+  position:absolute;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 30% 30%, #fff8 0 30%, #0000 40%),
+    linear-gradient(145deg, var(--pink1), var(--pink2));
+  /* antes tenía box-shadow fuerte: lo quitamos para que no pese tanto en móvil */
+  opacity:0;
+  animation: burst .6s ease-out forwards;
+  pointer-events:none;
 }
+
 @keyframes burst{0%{transform:scale(1);opacity:1}100%{transform:translate(var(--tx,0),var(--ty,0)) scale(.15);opacity:0}}
 
 .phrase{
@@ -185,5 +192,6 @@ body{
 /* Optimización extra */
 #hearts-layer{ contain: layout paint style; }
 .particle, .phrase{ will-change: transform, opacity; }
+
 
 
