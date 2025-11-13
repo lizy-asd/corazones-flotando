@@ -182,3 +182,8 @@ body{
 @media (max-width:480px){
   .particle{ box-shadow:none; }
 }
+/* Optimización extra */
+#hearts-layer{ contain: layout paint style; }
+.particle, .phrase{ will-change: transform, opacity; }
+
+
