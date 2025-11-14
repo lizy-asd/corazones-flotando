@@ -261,3 +261,44 @@ body{
 }
 
 
+
+/* --- Marca de agua elegante --- */
+.watermark-text{
+  position: fixed;
+  bottom: 12px;
+  right: 14px;
+  font-family: "Sail", "Poppins", serif;
+  font-size: 18px;
+  letter-spacing: 1.5px;
+  color: #00000030;       /* negro suave transparente */
+  text-shadow: 0 1px 2px #ffffff70;
+  opacity: 0.5;
+  user-select: none;
+  pointer-events: none;   /* no bloquea clics */
+  z-index: 9999;
+}
+
+/* más pequeña en celular */
+@media (max-width: 600px){
+  .watermark-text{
+    font-size: 15px;
+    right: 10px;
+    bottom: 10px;
+  }
+}
+
+.watermark-text{
+  position: fixed;
+  bottom: 12px;
+  right: 14px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: 1px;
+  color: #00000035;
+  text-shadow: 0 1px 2px #ffffff70;
+  opacity: 0.55;
+  user-select: none;
+  pointer-events: none;
+  z-index: 9999;
+}
