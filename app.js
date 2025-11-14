@@ -45,11 +45,12 @@ createClouds('clouds-mid',   IS_MOBILE ? 4 : 6, 25, 65, 28, 40);
 createClouds('clouds-front', IS_MOBILE ? 2 : 4, 55, 85, 34, 48);
 
 /* limpiar posibles transforms antiguos */
-['#stars-back','#stars-mid','#stars-front',
- '#clouds-back','#clouds-mid','#clouds-front','.aurora']
-  .forEach(sel=>{
-    document.querySelectorAll(sel).forEach(el=>el.style.transform='');
-  });
+[
+  '#stars-back','#stars-mid','#stars-front',
+  '#clouds-back','#clouds-mid','#clouds-front','.aurora'
+].forEach(sel=>{
+  document.querySelectorAll(sel).forEach(el=>el.style.transform='');
+});
 
 /* ====== corazones + frases ====== */
 const layer       = document.getElementById('hearts-layer');
@@ -66,17 +67,19 @@ const PHRASES = [
 function spawnHeart(){
   const h = tplHeart.content.firstElementChild.cloneNode(true);
   h.style.left = rand(6,94)+'vw';
-  h.style.top  = '110vh';
+
   const size = rand(40,70);
   h.style.width = h.style.height = size+'px';
+
+  // animamos solo con transform (sin tocar top)
   h.style.animation = `floatUp ${rand(9,15)}s linear forwards`;
 
-  // usamos pointerdown para que responda rápido en móvil
+  // pointerdown para que responda rápido en móvil
   h.addEventListener('pointerdown', e=>{
     e.preventDefault();
     h.blur?.();
     popHeart(e, h);
-  }, {passive:true});
+  }, { passive: false });
 
   h.addEventListener('animationend', ()=>h.remove(), {once:true});
   layer.appendChild(h);
@@ -101,14 +104,13 @@ function showPhrase(x,y){
 }
 
 function burst(x,y){
-  // MUY poquitas partículas en móvil
   const count = IS_MOBILE ? 6 : 12;
   const frag  = document.createDocumentFragment();
 
   for(let i=0;i<count;i++){
     const p = tplParticle.content.firstElementChild.cloneNode(true);
     const a = (Math.PI*2*i)/count + rand(-0.15,0.15);
-    const d = rand(26,70); // radio más corto (menos trabajo)
+    const d = rand(26,70);
     p.style.left = x+'px';
     p.style.top  = y+'px';
     p.style.setProperty('--tx', Math.cos(a)*d+'px');
@@ -120,11 +122,15 @@ function burst(x,y){
 }
 
 /* corazones flotando siempre */
-const INITIAL = IS_MOBILE ? 8 : 14;
+const INITIAL       = IS_MOBILE ? 5 : 14;
+const MIN_INTERVAL  = IS_MOBILE ? 1300 : 900;
+const MAX_INTERVAL  = IS_MOBILE ? 1900 : 1500;
+
 for(let i=0;i<INITIAL;i++) spawnHeart();
+
 (function loop(){
   spawnHeart();
-  setTimeout(loop, rand(900,1500));
+  setTimeout(loop, rand(MIN_INTERVAL, MAX_INTERVAL));
 })();
 
 /* chispitas SOLO en escritorio (para ahorrar en móvil) */
