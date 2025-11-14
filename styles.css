@@ -9,7 +9,7 @@
 
 /* base */
 *{box-sizing:border-box;margin:0;padding:0}
-/* 馃敡 quita el rect谩ngulo gris/negro en m贸viles */
+/* 🔧 quita el rectángulo gris/negro en móviles */
 *{ -webkit-tap-highlight-color: transparent; }
 
 html,body{height:100%}
@@ -25,7 +25,7 @@ body{
   background:linear-gradient(180deg,var(--sky-top),var(--sky-mid) 55%,var(--sky-low));
 }
 
-/* halo y vi帽eta */
+/* halo y viñeta */
 .vignette{
   position:absolute; inset:-10%;
   background:
@@ -152,7 +152,7 @@ body{
   contain: layout paint style;
 }
 
-/* coraz贸n + animaci贸n (lo usa JS) */
+/* corazón + animación (lo usa JS) */
 .heart{
   position:absolute;
   top:0;
@@ -195,7 +195,7 @@ body{
   }
 }
 
-/* part铆culas y frase */
+/* partículas y frase */
 .particle{
   position:absolute;
   width:8px;
@@ -233,7 +233,7 @@ body{
   will-change: transform, opacity;
 }
 
-/* versi贸n m谩s liviana en celular */
+/* versión más liviana en celular */
 @media (max-width: 768px){
   .phrase{
     text-shadow:0 0 2px #fff;
@@ -255,7 +255,7 @@ body{
   }
 }
 
-/* opcional: aligerar part铆culas en m贸viles muy b谩sicos */
+/* opcional: aligerar partículas en móviles muy básicos */
 @media (max-width:480px){
   .particle{ box-shadow:none; }
 }
